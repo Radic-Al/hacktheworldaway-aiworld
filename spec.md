@@ -2,9 +2,7 @@
 
 ## Product Goal
 
-Help a beginner or intermediate DIY builder turn a dining-table idea into a clear project plan that fits their space, tools, and budget.
-
-For the hackathon, support one predefined rectangular indoor table design with adjustable length and width and a fixed height. Choose one construction method and a small set of supported materials before building the app.
+Help a beginner or intermediate DIY builder turn a woodworking project idea into a clear project plan that fits their space, tools, and budget.
 
 ## 1. Simple User Flow
 
