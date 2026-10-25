@@ -12,7 +12,7 @@ Support one configurable family of rectangular, fixed-height indoor dining table
 
 Before implementation, select and document the construction template, its dimension bounds, actual material sizes, compatible fasteners, required tools, and evidence supporting those limits. An AI-generated template is not automatically validated.
 
-Include the constraint interview, one configurable design, geometry-derived diagrams, materials and cuts, tool checks, cost/time estimates, and a print-friendly manual.
+Include the constraint interview, one configurable design, geometry-derived diagrams, materials and cuts, tool checks, cost/time estimates, available-materials input (text or photos), skill-level adjustments, and a print-friendly manual.
 
 Defer arbitrary furniture generation, outdoor/folding/extendable designs, multiple construction systems, photorealistic variants, live retailer pricing, globally optimized stock cutting, accounts, community, and marketplace features. The MVP does not establish certified structural or weight-capacity claims.
 
@@ -24,6 +24,8 @@ When a user enters a simple idea (e.g., "I want to build a dinner table"), the a
 * **User Skill Level:** (Beginner, Intermediate, Advanced)
 * **Available Tools:** (e.g., hand tools only, basic power tools like a circular saw and drill, or a full workshop with table saw and router)
 
+**Available Lumber and Parts:** Let the user describe owned materials in text or upload photographs. Require confirmation of actual dimensions, quantities, material type, and usable condition before including stock in a plan. Photos assist capture; do not infer exact measurements or structural suitability from an image alone. Unsupported or unconfirmed stock is listed separately and is not counted as usable inventory.
+
 Ask only for missing or ambiguous information and preserve answers when constraints change. Capture currency and supported material preferences. Confirm indoor dining use and explain unsupported requests.
 
 Show a constraint summary for confirmation before generation. Clarify conflicting requirements instead of inventing an answer. If a request cannot fit the supported template, explain the conflict and propose a concrete revision; never silently exceed the budget or supported dimension bounds.
@@ -31,7 +33,7 @@ Show a constraint summary for confirmation before generation. Clarify conflictin
 ## 2. Core Feature Specifications
 Once constraints are gathered, the app must generate a cohesive project proposal featuring:
 * **Visual Design:** A dimensioned overview and assembly diagrams derived from the supported project's geometry. Future AI concept images must be labeled illustrative and must not serve as construction drawings.
-* **Material Calculation:** A cut list specifying supported materials, actual dimensions, quantities, hardware, and estimated costs. Calculate finished parts separately from a feasible stock allocation, accounting for saw kerf, trim allowance, and stated waste assumptions. Do not claim globally optimal cutting.
+* **Material Calculation:** A cut list specifying supported materials, actual dimensions, quantities, hardware, and estimated costs. Calculate finished parts separately from a feasible stock allocation, accounting for saw kerf, trim allowance, and stated waste assumptions. Separate usable stock the user already owns from materials and hardware that must be purchased. Do not claim globally optimal cutting.
 * **Tool Check:** A required and optional tools checklist based on what the user owns versus what the project demands.
 * **Labor & Time Estimates:** Estimated active build time, curing/drying time (for finishes), and total project timeline.
 
@@ -41,6 +43,7 @@ Once constraints are gathered, the app must generate a cohesive project proposal
 - Normalize calculations to one internal unit system; define conversion tolerance and display precision.
 - Reject cuts that do not fit their allocated stock, including kerf and allowances.
 - Use a local sample price catalog with currency, catalog date, and source or sample-data label. Calculate totals from quantities and unit prices; state exclusions such as tax, delivery, and tool purchases.
+- Allocate each confirmed owned stock item at most once, accounting for prior cuts, kerf, and remaining usable dimensions. Purchase quantities cover only the shortfall; show owned items separately from the purchase subtotal.
 - Mark missing prices as incomplete rather than zero. Disclose budget overruns.
 - Separate active work from waiting time. Use the selected glue/finish product's documented waiting times or explicitly mark them unresolved.
 - If a required tool is unavailable, offer only a supported alternative or block readiness until the constraint changes.
@@ -54,6 +57,10 @@ The core deliverable is an ultra-clear, sequential instruction manual. Each step
 * **Prerequisites & Completion Check:** What must be done first and how the builder can check the step before continuing.
 
 Distinguish cutting, dry fitting, assembly, and finishing. Generated warnings do not prove a design safe. Unsupported requests, invalid geometry, or missing required tools prevent publication as a ready-to-build plan.
+
+### Adjust Skill Level and Regenerate
+
+After viewing a plan, the user can increase or decrease the requested skill level and request a new iteration. Preserve the other confirmed constraints, adjust explanation detail and supported techniques, and revalidate the entire plan. Skill changes do not permit unsupported construction systems or bypass tool requirements. If no supported adaptation fits, explain the limitation. Show the new revision consistently across the manual, diagrams, parts, and estimates.
 
 ## 4. Generation Architecture and Shared Project Model
 
@@ -73,7 +80,8 @@ Define a machine-validated schema containing at least:
 | `constraints` | Confirmed budget, currency, units, space, dimensions, skill, tools, and purpose. |
 | `templateId`, `templateVersion` | Identify the construction system and its supported bounds. |
 | `materials`, `parts`, `hardware` | Catalog references, stable IDs, actual dimensions, and quantities. |
-| `stockAllocation` | Purchased stock and assigned cuts, including kerf and allowances. |
+| `availableInventory` | Confirmed owned materials/hardware, quantities, actual dimensions, condition, and text/photo provenance. |
+| `stockAllocation` | Owned and purchased stock, assigned cuts, remaining stock, kerf, and allowances. |
 | `steps` | Ordered actions, part/tool/hardware references, prerequisites, and completion checks. |
 | `diagrams` | Geometry-derived views, labeled part IDs, and plan revision. |
 | `estimates` | Cost arithmetic, currency, pricing provenance, exclusions, and time ranges. |
@@ -96,6 +104,9 @@ The MVP must pass these scenarios:
 9. Unsupported designs, out-of-range dimensions, malformed AI responses, and impossible constraints produce actionable errors rather than fabricated plans.
 10. The print-friendly manual retains diagram labels, dimensions, step order, and relevant warnings.
 11. Capacity requests never produce an unverified load-rating claim.
+12. Text and photo inputs require inventory confirmation; unconfirmed or unsupported materials are not used in allocations.
+13. Owned inventory reduces purchases only by its usable contribution; no item is double-counted, and costs cover the remaining purchase quantities.
+14. Increasing or decreasing skill level creates a consistently validated revision, preserves other constraints, and explains unsupported adaptations.
 
 Use deterministic fixture tests for calculations and cross-output consistency, plus an end-to-end test of the constraint-change demo. These checks establish internal consistency, not structural certification. The construction template requires documented domain review before anyone relies on it for a physical build.
 
