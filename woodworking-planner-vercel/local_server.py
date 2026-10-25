@@ -11,7 +11,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from planner import CATALOG, TOOLS, PlanError, build_plan
+from planner import CATALOG, IDEA_PRESETS, TOOLS, PlanError, build_plan
 
 
 ROOT = Path(__file__).resolve().parent / "public"
@@ -84,7 +84,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/api/config":
-            self._send(200, {**oci_settings(), "tools": TOOLS, "catalog": CATALOG})
+            self._send(200, {**oci_settings(), "tools": TOOLS, "catalog": CATALOG, "ideas": IDEA_PRESETS})
             return
         if path == "/api/health":
             self._send(200, {"ok": True})

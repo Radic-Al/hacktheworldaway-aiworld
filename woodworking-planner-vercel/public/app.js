@@ -21,6 +21,40 @@ function showMessage(message, type = 'info') {
 
 function clearMessage() { $('message').hidden = true; }
 
+function selectedIdeaId() {
+  return document.querySelector('input[name="ideaPreset"]:checked')?.value || null;
+}
+
+function chooseIdea(id, focusDescription = true) {
+  const preset = config.ideas[id];
+  if (!preset) return;
+  const description = $('description-step');
+  if (description.dataset.ideaPreset !== id) $('idea').value = '';
+  description.dataset.ideaPreset = id;
+  description.hidden = false;
+  $('length').value = preset.length;
+  $('width').value = preset.width;
+  $('idea-prompt').textContent = `${preset.title} starts at ${preset.length} × ${preset.width} in. Describe your preferences, then confirm the final measurements below.`;
+  if (focusDescription) $('idea').focus();
+}
+
+function renderIdeas() {
+  const list = $('idea-options');
+  list.replaceChildren();
+  Object.entries(config.ideas).forEach(([id, preset]) => {
+    const option = node('label', 'idea-option');
+    const input = node('input');
+    input.type = 'radio'; input.name = 'ideaPreset'; input.value = id; input.required = true;
+    const copy = node('span');
+    copy.append(node('strong', '', preset.title), node('small', '', preset.summary), node('em', '', `${preset.length} × ${preset.width} in · 30 in high`));
+    option.append(input, copy);
+    list.append(option);
+  });
+  list.addEventListener('change', (event) => {
+    if (event.target.name === 'ideaPreset') chooseIdea(event.target.value);
+  });
+}
+
 function markChanged(event) {
   if (event.target.id === 'confirmed') return;
   if (currentPlan) {
@@ -89,7 +123,7 @@ function addInventoryRow(defaults = {}) {
 
 function payload() {
   return {
-    idea: $('idea').value.trim(), length: $('length').value, width: $('width').value, budget: $('budget').value,
+    ideaPreset: selectedIdeaId(), idea: $('idea').value.trim(), length: $('length').value, width: $('width').value, budget: $('budget').value,
     skill: document.querySelector('input[name="skill"]:checked').value,
     tools: [...document.querySelectorAll('input[name="tools"]:checked')].map((input) => input.value),
     inventory: [...document.querySelectorAll('.inventory-row')].map((row) => row.read()),
@@ -102,6 +136,7 @@ function payload() {
 function review() {
   clearMessage();
   const data = payload();
+  if (!data.ideaPreset) { showMessage('Choose a starting table idea first.', 'error'); $('idea-options').querySelector('input')?.focus(); return; }
   if (!data.idea) { showMessage('Describe your table idea first.', 'error'); $('idea').focus(); return; }
   if (!Number.isFinite(Number(data.length)) || data.length === '' || Number(data.length) < 48 || Number(data.length) > 72 || Number(data.length) * 4 % 1 !== 0) {
     showMessage('Enter a table length from 48 to 72 inches in quarter-inch increments.', 'error'); $('length').focus(); return;
@@ -114,7 +149,7 @@ function review() {
   }
   const summary = $('summary'); summary.replaceChildren();
   const facts = [
-    ['Idea', data.idea], ['Table size', `${size(data.length)} × ${size(data.width)} × 30 in`],
+    ['Starting idea', config.ideas[data.ideaPreset].title], ['Description', data.idea], ['Table size', `${size(data.length)} × ${size(data.width)} × 30 in`],
     ['Budget', money(Number(data.budget))], ['Instruction detail', data.skill],
     ['Tools selected', `${data.tools.length} of ${Object.keys(config.tools).length}`],
     ['Owned material entries', String(data.inventory.length)],
@@ -259,10 +294,11 @@ function renderPlan(plan) {
   $('print-button').hidden = false;
   $('prototype-notice').textContent = plan.prototypeNotice;
   $('plan-mode').textContent = `${plan.ai.source.toUpperCase()} / ${plan.templateId}`;
+  $('plan-idea-title').textContent = plan.inputs.ideaTitle;
   $('plan-subtitle').textContent = `A fixed-height rectangular table for an indoor dining space. ${plan.inputs.skill === 'beginner' ? 'Beginner' : 'Intermediate'} instruction detail.`;
   $('revision').textContent = `REV ${plan.revision}`;
   $('footer-revision').textContent = plan.revision;
-  $('plan-meta').textContent = `${size(plan.inputs.length)} × ${size(plan.inputs.width)} × ${size(plan.inputs.height)} in · Revision ${plan.revision}`;
+  $('plan-meta').textContent = `${plan.inputs.ideaTitle} · ${size(plan.inputs.length)} × ${size(plan.inputs.width)} × ${size(plan.inputs.height)} in · Revision ${plan.revision}`;
   const metrics = $('metrics'); metrics.replaceChildren();
   [['Length', `${size(plan.inputs.length)} in`], ['Width', `${size(plan.inputs.width)} in`], ['Height', `${size(plan.inputs.height)} in`], ['Est. buy', money(plan.estimate.purchaseSubtotal)]]
     .forEach(([label, value]) => { const card = node('div', 'metric'); card.append(node('span', '', label), node('strong', '', value)); metrics.append(card); });
@@ -295,6 +331,7 @@ async function init() {
     const response = await fetch('/api/config');
     if (!response.ok) throw new Error('Configuration unavailable.');
     config = await response.json();
+    renderIdeas();
     renderTools();
     const live = document.querySelector('input[name="mode"][value="oci"]');
     live.disabled = !config.configured;
@@ -311,6 +348,8 @@ async function init() {
   $('reference-photos').addEventListener('change', photoPreview);
   $('print-button').addEventListener('click', () => window.print());
   $('sample-button').addEventListener('click', () => {
+    document.querySelector('input[name="ideaPreset"][value="everyday"]').checked = true;
+    chooseIdea('everyday', false);
     $('idea').value = 'I want a simple indoor dining table for four, and I already have one 4×4 board.';
     $('length').value = '60'; $('width').value = '32'; $('budget').value = '220';
     document.querySelectorAll('input[name="tools"]').forEach((input) => { input.checked = true; });

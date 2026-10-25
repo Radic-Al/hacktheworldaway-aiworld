@@ -18,7 +18,7 @@
     <section class="intro no-print" aria-labelledby="page-title">
       <div class="eyebrow">ONE DESIGN · ONE CONSISTENT PLAN</div>
       <h1 id="page-title">A table plan that<br><em>fits your workshop.</em></h1>
-      <p>Describe your idea, confirm the essentials, and get one coherent dining-table plan. Every drawing, cut, and step comes from the same measurements.</p>
+      <p>Choose a starting idea, describe what you have in mind, and get one coherent dining-table plan. Every drawing, cut, and step comes from the same measurements.</p>
       <div class="intro-note"><span class="note-icon" aria-hidden="true">↗</span><span>Prototype for one indoor table design. A qualified review is needed before building.</span></div>
     </section>
 
@@ -26,9 +26,16 @@
       <aside class="input-panel no-print" aria-labelledby="input-heading">
         <div class="panel-top"><div><span class="section-index">01 / YOUR PROJECT</span><h2 id="input-heading">Start with the details</h2></div><button type="button" id="sample-button" class="text-button">Load demo</button></div>
         <form id="planner-form" novalidate>
-          <label for="idea">What would you like to build?</label>
-          <textarea id="idea" name="idea" rows="3" maxlength="500" placeholder="I want a simple dining table for four…" required></textarea>
-          <p class="field-help">We'll collect the missing details before making a plan.</p>
+          <fieldset class="idea-picker">
+            <legend>Choose a starting idea</legend>
+            <p class="field-help">These are three sizes of the same supported indoor table design. Select one before describing your project.</p>
+            <div id="idea-options" class="idea-options"></div>
+          </fieldset>
+          <div id="description-step" class="description-step" hidden>
+            <label for="idea">Describe your selected table idea</label>
+            <textarea id="idea" name="idea" rows="3" maxlength="500" placeholder="Tell us what matters about this table and where you plan to use it…" required></textarea>
+            <p class="field-help" id="idea-prompt">We'll collect the missing details before making a plan.</p>
+          </div>
 
           <div class="form-section"><span class="form-step">1</span><h3>Size and budget</h3></div>
           <p class="field-help">This prototype supports a 30 in high indoor table, 48–72 in long and 28–40 in wide.</p>
@@ -79,7 +86,7 @@
         <div id="plan" hidden>
           <div class="print-heading"><span class="eyebrow">BENCHLINE / TABLE PLAN</span><h2>Indoor dining table</h2><p id="plan-meta"></p></div>
           <div class="plan-alert" id="prototype-notice"></div>
-          <div class="plan-title-row"><div><span class="section-index" id="plan-mode"></span><h3>Built around your space</h3><p id="plan-subtitle"></p></div><div class="revision" id="revision"></div></div>
+          <div class="plan-title-row"><div><span class="section-index" id="plan-mode"></span><h3 id="plan-idea-title">Your table idea</h3><p id="plan-subtitle"></p></div><div class="revision" id="revision"></div></div>
           <div class="metric-grid" id="metrics"></div>
           <div id="budget-banner" class="budget-banner" hidden></div>
 

@@ -19,6 +19,27 @@ KERF = 0.125  # inches per crosscut
 HEIGHT = 30.0
 OVERHANG = 2.0
 
+IDEA_PRESETS = {
+    "compact": {
+        "title": "Compact dining nook",
+        "summary": "A smaller table for an apartment or breakfast corner.",
+        "length": 48,
+        "width": 28,
+    },
+    "everyday": {
+        "title": "Everyday family table",
+        "summary": "A practical four-person table for regular meals.",
+        "length": 60,
+        "width": 32,
+    },
+    "hosting": {
+        "title": "Room to host",
+        "summary": "A longer tabletop for meals with friends or family.",
+        "length": 72,
+        "width": 40,
+    },
+}
+
 TOOLS = {
     "circular_saw": "Circular saw with a straightedge guide",
     "miter_saw": "Miter saw rated to cut actual 3.5 in square stock",
@@ -129,6 +150,9 @@ def _inventory(items):
 def build_plan(raw):
     if not isinstance(raw, dict):
         raise PlanError("Provide a plan request.")
+    idea_preset = raw.get("ideaPreset")
+    if not isinstance(idea_preset, str) or idea_preset not in IDEA_PRESETS:
+        raise PlanError("Choose one of the three starting table ideas before describing it.", "ideaPreset")
     idea = str(raw.get("idea", "")).strip()[:500]
     if not idea:
         raise PlanError("Describe the table you want to build.", "idea")
@@ -199,12 +223,12 @@ def build_plan(raw):
     assigned = [part_id for bins in stock.values() for bin_item in bins for part_id in bin_item["partIds"]]
     assert sorted(assigned) == sorted(ids)
 
-    canonical = {"idea": idea, "length": length, "width": width, "budget": budget, "skill": skill, "tools": sorted(tools), "inventory": inventory_entries}
+    canonical = {"ideaPreset": idea_preset, "idea": idea, "length": length, "width": width, "budget": budget, "skill": skill, "tools": sorted(tools), "inventory": inventory_entries}
     revision = hashlib.sha256(json.dumps(canonical, sort_keys=True).encode()).hexdigest()[:10]
     return {
         "schemaVersion": SCHEMA_VERSION, "templateId": TEMPLATE_VERSION, "revision": revision,
         "prototypeNotice": "Prototype plan only. Have the construction method and final dimensions reviewed before a physical build; no load rating or certification is claimed.",
-        "inputs": {"idea": idea, "length": length, "width": width, "height": HEIGHT, "budget": budget, "skill": skill, "units": "in", "currency": "USD"},
+        "inputs": {"ideaPreset": idea_preset, "ideaTitle": IDEA_PRESETS[idea_preset]["title"], "idea": idea, "length": length, "width": width, "height": HEIGHT, "budget": budget, "skill": skill, "units": "in", "currency": "USD"},
         "geometry": {"length": length, "width": width, "height": HEIGHT, "legSize": 3.5, "overhang": OVERHANG, "apronDepth": 3.5},
         "parts": parts, "stockAssignment": stock, "shopping": shopping, "inventory": inventory_entries,
         "tools": [{"id": key, "label": label, "available": True} for key, label in TOOLS.items()],
