@@ -1,135 +1,91 @@
-# AI Woodworking Planner: Hackathon MVP Specification
+# AI Woodworking Planner: Hackathon MVP
 
-## Product Promise and Target User
+## Product Goal
 
-Turn an idea into a woodworking project the user can build with their tools, space, and budget.
+Help a beginner or intermediate DIY builder turn a dining-table idea into a clear project plan that fits their space, tools, and budget.
 
-The first user is a beginner or intermediate DIY builder who wants a simple indoor dining table and needs help translating an idea into consistent dimensions, materials, cuts, and assembly instructions. Success means producing one coherent plan whose drawings, cut list, and instructions describe the same object.
+For the hackathon, support one predefined rectangular indoor table design with adjustable length and width and a fixed height. Choose one construction method and a small set of supported materials before building the app.
 
-## MVP Scope
+## 1. Simple User Flow
 
-Support one configurable family of rectangular, fixed-height indoor dining tables using a single predefined construction system. Dimensions and material choices must stay within the template's documented bounds and supported catalog.
+1. The user describes their table idea.
+2. A short form collects dimensions, budget, available tools, and skill level. Use one unit system and one currency throughout the demo.
+3. The user confirms the inputs and generates a plan.
+4. The app displays a diagram, cut list, shopping list, and assembly instructions.
+5. The user can change dimensions or request simpler/more detailed instructions and regenerate.
+6. The user can print the plan using a clean browser print view.
 
-Before implementation, select and document the construction template, its dimension bounds, actual material sizes, compatible fasteners, required tools, and evidence supporting those limits. An AI-generated template is not automatically validated.
+Do not generate a plan immediately from a vague prompt. Ask for the missing essentials first. Explain when a request falls outside the supported table design.
 
-Include the constraint interview, one configurable design, geometry-derived diagrams, materials and cuts, tool checks, cost/time estimates, available-materials input (text or photos), skill-level adjustments, and a print-friendly manual.
+## 2. Plan Output
 
-Defer arbitrary furniture generation, outdoor/folding/extendable designs, multiple construction systems, photorealistic variants, live retailer pricing, globally optimized stock cutting, accounts, community, and marketplace features. The MVP does not establish certified structural or weight-capacity claims.
+Each plan includes:
 
-## 1. User Onboarding & Idea Capture
-When a user enters a simple idea (e.g., "I want to build a dinner table"), the app must NOT immediately generate a plan. Instead, it must interactively prompt the user for the following key constraints:
-* **Budget:** Amount and currency. A rough tier is acceptable initially, but clarify the amount before comparing estimates with a budget.
-* **Purpose & Environment:** Confirm indoor dining use. Explain that outdoor, folding, and other unsupported designs are outside the MVP.
-* **Dimensions & Space:** Desired length, width, height, seating needs, available space, and preferred units. Weight-capacity requests may be recorded as intent but must not become verified load-rating claims.
-* **User Skill Level:** (Beginner, Intermediate, Advanced)
-* **Available Tools:** (e.g., hand tools only, basic power tools like a circular saw and drill, or a full workshop with table saw and router)
+- **Table diagram:** A simple dimensioned drawing generated from the predefined design.
+- **Cut list:** Part labels, actual dimensions, and quantities.
+- **Shopping list:** Required lumber and hardware, with an approximate total based on clearly labeled sample prices.
+- **Tool checklist:** Required tools compared with the tools the user has.
+- **Assembly steps:** Ordered instructions referencing the same part labels as the diagram and cut list, with relevant tool and safety notes.
 
-**Available Lumber and Parts:** Let the user describe owned materials in text or upload photographs. Require confirmation of actual dimensions, quantities, material type, and usable condition before including stock in a plan. Photos assist capture; do not infer exact measurements or structural suitability from an image alone. Unsupported or unconfirmed stock is listed separately and is not counted as usable inventory.
+The essential requirement: the diagram, cut list, shopping list, and assembly instructions describe the same table.
 
-Ask only for missing or ambiguous information and preserve answers when constraints change. Capture currency and supported material preferences. Confirm indoor dining use and explain unsupported requests.
+## 3. Available Materials and Skill Level
 
-Show a constraint summary for confirmation before generation. Clarify conflicting requirements instead of inventing an answer. If a request cannot fit the supported template, explain the conflict and propose a concrete revision; never silently exceed the budget or supported dimension bounds.
+### Owned materials
 
-## 2. Core Feature Specifications
-Once constraints are gathered, the app must generate a cohesive project proposal featuring:
-* **Visual Design:** A dimensioned overview and assembly diagrams derived from the supported project's geometry. Future AI concept images must be labeled illustrative and must not serve as construction drawings.
-* **Material Calculation:** A cut list specifying supported materials, actual dimensions, quantities, hardware, and estimated costs. Calculate finished parts separately from a feasible stock allocation, accounting for saw kerf, trim allowance, and stated waste assumptions. Separate usable stock the user already owns from materials and hardware that must be purchased. Do not claim globally optimal cutting.
-* **Tool Check:** A required and optional tools checklist based on what the user owns versus what the project demands.
-* **Labor & Time Estimates:** Estimated active build time, curing/drying time (for finishes), and total project timeline.
+Allow optional text input for lumber and hardware the user already owns. Ask them to confirm dimensions and quantities. Subtract confirmed, matching stock from the shopping list using a simple matching rule; complex offcut allocation and cutting optimization can wait.
 
-### Calculation and Estimate Rules
+Photos may be attached as references. The MVP does not need to identify materials or infer measurements from images; the user's confirmed text supplies those details.
 
-- Distinguish nominal lumber labels from actual dimensions used in calculations.
-- Normalize calculations to one internal unit system; define conversion tolerance and display precision.
-- Reject cuts that do not fit their allocated stock, including kerf and allowances.
-- Use a local sample price catalog with currency, catalog date, and source or sample-data label. Calculate totals from quantities and unit prices; state exclusions such as tax, delivery, and tool purchases.
-- Allocate each confirmed owned stock item at most once, accounting for prior cuts, kerf, and remaining usable dimensions. Purchase quantities cover only the shortfall; show owned items separately from the purchase subtotal.
-- Mark missing prices as incomplete rather than zero. Disclose budget overruns.
-- Separate active work from waiting time. Use the selected glue/finish product's documented waiting times or explicitly mark them unresolved.
-- If a required tool is unavailable, offer only a supported alternative or block readiness until the constraint changes.
+### Skill adjustment
 
-## 3. Step-by-Step "IKEA-Style" Manual
-The core deliverable is an ultra-clear, sequential instruction manual. Each step must include:
-* **Action & Cut Details:** Exact instructions (e.g., "Cut 4 pieces of 2x4 lumber at 36 inches").
-* **Tool Assignment:** Which specific tool to use for that step.
-* **Safety Precautions:** Highlighted safety warnings (e.g., "⚠️ Always wear safety glasses and ear protection when operating the miter saw").
-* **Visual Diagrams:** Geometry-derived drawings for that assembly phase, labeled with the same part IDs as the cut list.
-* **Prerequisites & Completion Check:** What must be done first and how the builder can check the step before continuing.
+Let the user request simpler or more detailed instructions after viewing a plan. Change explanations, terminology, and step detail while keeping the same construction method and geometry. Preserve the other inputs when regenerating.
 
-Distinguish cutting, dry fitting, assembly, and finishing. Generated warnings do not prove a design safe. Unsupported requests, invalid geometry, or missing required tools prevent publication as a ready-to-build plan.
+## 4. Lightweight Implementation
 
-### Adjust Skill Level and Regenerate
+- Use AI to interpret the request, help collect missing inputs, and explain assembly steps for the predefined design.
+- Use straightforward code to calculate part dimensions, quantities, and sample costs from the template.
+- Keep a single project data object containing the inputs, parts, hardware, required tools, estimated cost, and assembly steps. Generate the drawing and lists from that object.
+- Keep dimensions and part labels fixed when AI writes or simplifies instructions.
+- Replace the displayed plan together after regeneration so outputs remain consistent. Keep user inputs if generation fails and offer retry.
+- Make one real OCI-backed AI request in the demo. Select the service and confirm access early. Keep credentials on the server and out of the repository.
 
-After viewing a plan, the user can increase or decrease the requested skill level and request a new iteration. Preserve the other confirmed constraints, adjust explanation detail and supported techniques, and revalidate the entire plan. Skill changes do not permit unsupported construction systems or bypass tool requirements. If no supported adaptation fits, explain the limitation. Show the new revision consistently across the manual, diagrams, parts, and estimates.
+## 5. Basic Boundaries
 
-## 4. Generation Architecture and Shared Project Model
+- Define the supported length and width range and required tools for the chosen template.
+- Explain unsupported dimensions or missing required tools instead of inventing a construction alternative.
+- Show when the sample shopping estimate exceeds the user's budget. Prices are illustrative, not live quotes.
+- Do not claim verified weight capacity or structural certification. Present the output as a prototype plan requiring review before a physical build.
+- Include relevant safety notes in the assembly steps.
 
-Use this pipeline:
+## 6. Done for the Hackathon
 
-`Confirmed constraints → AI maps intent to supported template parameters → deterministic calculations and validation → shared project model → diagrams, lists, and instructions`
+The MVP is ready to demonstrate when:
 
-The AI interprets requests and explains the plan. Deterministic code owns dimensions, quantities, stock allocation, cost arithmetic, and validation. Validate AI output against the schema and supported catalog before calculating or rendering a plan.
+1. A vague table idea leads to the short form and a confirmed set of inputs.
+2. One supported example produces a diagram, cut list, shopping list, and steps that agree on dimensions, quantities, and part labels.
+3. Changing length or width updates the affected outputs consistently.
+4. Confirmed matching owned materials reduce the purchase quantities and estimated cost.
+5. Changing skill level alters instruction detail without changing the table's construction.
+6. Unsupported dimensions and missing required tools produce a clear explanation.
+7. A live OCI-backed request succeeds; a failed request preserves inputs and allows retry.
+8. The printed plan retains readable diagrams, dimensions, lists, and steps.
 
-All outputs derive from one versioned model. Each part has a stable ID, material reference, quantity, and actual dimensions. Cuts, diagrams, and steps reference those same IDs. Tool and hardware references resolve to catalog entries. A constraint edit creates a new revision and invalidates dependent outputs; never mix revisions.
+Verify the template calculations with a few known examples and manually walk through the complete demo flow. A broad automated acceptance suite is outside this MVP.
 
-Define a machine-validated schema containing at least:
+## 7. Demo Story
 
-| Field | Purpose |
-| --- | --- |
-| `schemaVersion`, `planId`, `revision` | Identify the data contract and exact plan revision. |
-| `constraints` | Confirmed budget, currency, units, space, dimensions, skill, tools, and purpose. |
-| `templateId`, `templateVersion` | Identify the construction system and its supported bounds. |
-| `materials`, `parts`, `hardware` | Catalog references, stable IDs, actual dimensions, and quantities. |
-| `availableInventory` | Confirmed owned materials/hardware, quantities, actual dimensions, condition, and text/photo provenance. |
-| `stockAllocation` | Owned and purchased stock, assigned cuts, remaining stock, kerf, and allowances. |
-| `steps` | Ordered actions, part/tool/hardware references, prerequisites, and completion checks. |
-| `diagrams` | Geometry-derived views, labeled part IDs, and plan revision. |
-| `estimates` | Cost arithmetic, currency, pricing provenance, exclusions, and time ranges. |
-| `validation` | Ready/blocked status, errors, warnings, and unresolved assumptions. |
+“I want a dining table for this space, and I already have some lumber.”
 
-Schema validity alone is insufficient: geometric and cross-reference checks must pass. Preserve entered constraints after generation errors and explain retry options without showing a partial plan as complete.
+Enter the constraints and confirmed owned materials, generate the plan, and show how the shopping list accounts for what the user has. Change the table dimensions, show the matching drawing and cuts, request simpler instructions, and open the print view.
 
-## 5. Acceptance Criteria and Verification
+## 8. Deferred
 
-The MVP must pass these scenarios:
+Arbitrary furniture, outdoor/folding/extendable tables, alternative joinery systems, photorealistic design variants, automatic photo identification, live retailer pricing, stock-cutting optimization, detailed build scheduling, multiple unit systems/currencies, accounts, community, marketplace, and formal certification workflows.
 
-1. A vague dining-table request gathers and confirms missing constraints before generation.
-2. A supported request produces diagrams, parts, cuts, hardware, and steps that agree on IDs, dimensions, quantities, and revision.
-3. Equivalent metric and imperial inputs produce equivalent geometry within the documented tolerance.
-4. Every cut fits its allocated stock with kerf and allowances included; insufficient stock is detected.
-5. Every referenced part, tool, hardware item, and prerequisite exists; required parts are accounted for in assembly.
-6. Costs match catalog arithmetic. Missing prices and budget overruns are visible.
-7. Removing a required tool selects a supported alternative or blocks readiness with an actionable explanation.
-8. Changing dimensions regenerates every affected diagram, cut, quantity, estimate, and instruction without stale outputs.
-9. Unsupported designs, out-of-range dimensions, malformed AI responses, and impossible constraints produce actionable errors rather than fabricated plans.
-10. The print-friendly manual retains diagram labels, dimensions, step order, and relevant warnings.
-11. Capacity requests never produce an unverified load-rating claim.
-12. Text and photo inputs require inventory confirmation; unconfirmed or unsupported materials are not used in allocations.
-13. Owned inventory reduces purchases only by its usable contribution; no item is double-counted, and costs cover the remaining purchase quantities.
-14. Increasing or decreasing skill level creates a consistently validated revision, preserves other constraints, and explains unsupported adaptations.
+## 9. Immediate Team Decisions
 
-Use deterministic fixture tests for calculations and cross-output consistency, plus an end-to-end test of the constraint-change demo. These checks establish internal consistency, not structural certification. The construction template requires documented domain review before anyone relies on it for a physical build.
-
-## 6. OCI Integration and Hackathon Demo
-
-Before implementation, document the chosen OCI service, its capability, request/response boundary, required configuration, and failure behavior. Service selection remains open; this spec assumes no specific service.
-
-The demo must show an actual successful OCI-backed request. Keep credentials out of the client and repository. On timeout or service failure, retain inputs and offer retry. Clearly label sample or fallback responses rather than presenting them as live results.
-
-Demo sequence:
-
-1. Enter "I want to build a dining table."
-2. Complete and confirm the constraints.
-3. Generate the supported plan using the OCI-backed capability.
-4. Inspect matching diagram labels, parts, cuts, estimates, and assembly steps.
-5. Change the available space and show consistent regeneration.
-6. Remove a required tool and show a supported adaptation or explicit blocked state.
-7. Open the print-friendly manual.
-
-## 7. Decisions Required Before Implementation
-
-- Select the construction template and document supported bounds and review evidence.
-- Define material, hardware, tool, and sample-price catalogs.
-- Specify internal units, display precision, kerf, trim, and waste policies.
-- Select the OCI-backed capability and deployment approach.
-- Confirm the hackathon deadline and team capacity, then sequence the included scope accordingly.
+- Choose the table template, supported dimensions, materials, and required tools.
+- Choose the demo's units, currency, and sample prices.
+- Choose the OCI service and confirm credentials/access.
+- Confirm the hackathon deadline and divide the form, calculations, AI integration, diagram, and print-view work.
