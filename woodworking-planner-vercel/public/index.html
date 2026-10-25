@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f3ec">
+  <title>Benchline — Dining Table Planner</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header no-print">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▥</span><span>Benchline</span></div>
+    <span class="header-meta">A focused woodworking planner <span class="header-dot">•</span> Hackathon MVP</span>
+  </header>
+
+  <main>
+    <section class="intro no-print" aria-labelledby="page-title">
+      <div class="eyebrow">ONE DESIGN · ONE CONSISTENT PLAN</div>
+      <h1 id="page-title">A table plan that<br><em>fits your workshop.</em></h1>
+      <p>Describe your idea, confirm the essentials, and get one coherent dining-table plan. Every drawing, cut, and step comes from the same measurements.</p>
+      <div class="intro-note"><span class="note-icon" aria-hidden="true">↗</span><span>Prototype for one indoor table design. A qualified review is needed before building.</span></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="input-panel no-print" aria-labelledby="input-heading">
+        <div class="panel-top"><div><span class="section-index">01 / YOUR PROJECT</span><h2 id="input-heading">Start with the details</h2></div><button type="button" id="sample-button" class="text-button">Load demo</button></div>
+        <form id="planner-form" novalidate>
+          <label for="idea">What would you like to build?</label>
+          <textarea id="idea" name="idea" rows="3" maxlength="500" placeholder="I want a simple dining table for four…" required></textarea>
+          <p class="field-help">We'll collect the missing details before making a plan.</p>
+
+          <div class="form-section"><span class="form-step">1</span><h3>Size and budget</h3></div>
+          <p class="field-help">This prototype supports a 30 in high indoor table, 48–72 in long and 28–40 in wide.</p>
+          <div class="field-grid three">
+            <div><label for="length">Length <span>in</span></label><input id="length" name="length" type="number" min="48" max="72" step="0.25" placeholder="60" required></div>
+            <div><label for="width">Width <span>in</span></label><input id="width" name="width" type="number" min="28" max="40" step="0.25" placeholder="32" required></div>
+            <div><label for="budget">Budget <span>USD</span></label><input id="budget" name="budget" type="number" min="0" step="1" placeholder="250" required></div>
+          </div>
+
+          <div class="form-section"><span class="form-step">2</span><h3>Your tools</h3></div>
+          <p class="field-help">The fixed construction method requires these tools. Missing tools block a ready plan.</p>
+          <div id="tool-list" class="check-grid"></div>
+
+          <div class="form-section"><span class="form-step">3</span><h3>Materials on hand <span class="optional">optional</span></h3></div>
+          <label for="inventory-notes">Describe what you already have</label>
+          <textarea id="inventory-notes" rows="2" maxlength="500" placeholder="For example: two 8 ft 4×4 boards in good condition"></textarea>
+          <p class="field-help">Add confirmed items below to reduce the shopping list. Only complete matching stock units count.</p>
+          <div id="inventory-rows" class="inventory-rows"></div>
+          <button type="button" class="secondary-button add-button" id="add-inventory">+ Add confirmed item</button>
+          <label for="reference-photos" class="photo-label">Reference photos <span>optional</span></label>
+          <input id="reference-photos" type="file" accept="image/*" multiple>
+          <div id="photo-previews" class="photo-previews"></div>
+          <p class="field-help" id="photo-note">Photos stay in this browser session. They are not measured or identified by the app.</p>
+
+          <div class="form-section"><span class="form-step">4</span><h3>Instruction detail</h3></div>
+          <div class="choice-row" role="radiogroup" aria-label="Instruction detail">
+            <label class="choice"><input type="radio" name="skill" value="beginner" checked><span>Beginner<br><small>More guidance</small></span></label>
+            <label class="choice"><input type="radio" name="skill" value="intermediate"><span>Intermediate<br><small>More concise</small></span></label>
+          </div>
+
+          <div class="form-section"><span class="form-step">5</span><h3>Review and generate</h3></div>
+          <button type="button" id="review-button" class="secondary-button full">Review inputs</button>
+          <div id="review-panel" class="review-panel" hidden>
+            <h4>Your confirmed brief</h4>
+            <div id="summary"></div>
+            <label class="confirm-row"><input id="confirmed" type="checkbox"><span>These details and my material measurements are correct.</span></label>
+            <div class="mode-row"><label><input type="radio" name="mode" value="sample" checked> Sample preview</label><label><input type="radio" name="mode" value="oci"> Live OCI</label></div>
+            <p id="oci-status" class="field-help">Checking OCI setup…</p>
+            <button type="submit" id="generate-button" class="primary-button full">Generate table plan <span aria-hidden="true">↗</span></button>
+          </div>
+        </form>
+      </aside>
+
+      <section class="result-panel" aria-labelledby="result-heading">
+        <div class="result-head no-print"><div><span class="section-index">02 / YOUR PLAN</span><h2 id="result-heading">The build plan</h2></div><button type="button" id="print-button" class="secondary-button" hidden>Print plan ↗</button></div>
+        <div id="message" class="message" role="status" aria-live="polite" hidden></div>
+        <div id="empty-state" class="empty-state no-print"><div class="empty-illustration" aria-hidden="true"><span></span><span></span><span></span><span></span></div><span class="empty-kicker">READY WHEN YOU ARE</span><h3>First, tell us about<br>your table.</h3><p>Review your inputs to create a plan. Dimensions, parts, and steps will stay in sync.</p></div>
+        <div id="plan" hidden>
+          <div class="print-heading"><span class="eyebrow">BENCHLINE / TABLE PLAN</span><h2>Indoor dining table</h2><p id="plan-meta"></p></div>
+          <div class="plan-alert" id="prototype-notice"></div>
+          <div class="plan-title-row"><div><span class="section-index" id="plan-mode"></span><h3>Built around your space</h3><p id="plan-subtitle"></p></div><div class="revision" id="revision"></div></div>
+          <div class="metric-grid" id="metrics"></div>
+          <div id="budget-banner" class="budget-banner" hidden></div>
+
+          <section class="plan-section" aria-labelledby="diagram-heading"><div class="section-heading"><span>01</span><div><h3 id="diagram-heading">The table</h3><p>Dimensioned views, drawn from the same part data as the cuts.</p></div></div><div class="diagram-wrap"><svg id="diagram" viewBox="0 0 800 430" role="img" aria-label="Dimensioned top and front views of the table"></svg><p class="diagram-caption">Top view and front elevation · all dimensions in inches · drawing is schematic</p></div></section>
+
+          <section class="plan-section" aria-labelledby="cuts-heading"><div class="section-heading"><span>02</span><div><h3 id="cuts-heading">Cut list</h3><p>Actual material dimensions, not nominal lumber labels.</p></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">Description</th><th scope="col">Cut size (in)</th><th scope="col">Qty</th></tr></thead><tbody id="cut-rows"></tbody></table></div><p class="micro-note" id="stock-note"></p><div class="stock-cards" id="stock-cards"></div></section>
+
+          <section class="plan-section" aria-labelledby="shopping-heading"><div class="section-heading"><span>03</span><div><h3 id="shopping-heading">Shopping list</h3><p>Confirmed matching stock is counted before purchases.</p></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Material or supply</th><th scope="col">Need</th><th scope="col">Owned</th><th scope="col">Buy</th><th scope="col">Est. cost</th></tr></thead><tbody id="shopping-rows"></tbody></table></div><div class="total-row"><div><span>Estimated purchase subtotal</span><small id="estimate-note"></small></div><strong id="total"></strong></div><div id="inventory-feedback"></div></section>
+
+          <section class="plan-section" aria-labelledby="tools-heading"><div class="section-heading"><span>04</span><div><h3 id="tools-heading">Tool checklist</h3><p>These are required by this one construction method.</p></div></div><ul class="tool-result" id="tool-result"></ul></section>
+
+          <section class="plan-section" aria-labelledby="steps-heading"><div class="section-heading"><span>05</span><div><h3 id="steps-heading">Build sequence</h3><p>Every step refers to the part labels above.</p></div></div><div id="ai-note" class="ai-note"></div><ol id="steps" class="steps"></ol></section>
+          <footer class="plan-footer">Benchline prototype · plan revision <span id="footer-revision"></span> · Confirm all dimensions, tool instructions, and the construction method with a qualified reviewer before building.</footer>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer no-print"><span>Benchline / one table, one plan</span><span>Built for an honest first prototype.</span></footer>
+</body>
+</html>
