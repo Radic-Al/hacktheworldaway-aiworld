@@ -1,17 +1,19 @@
 # Benchline Woodworking Planner
 
-A local hackathon MVP for one configurable indoor dining table. It follows the updated `spec.md` from `Radic-Al/hacktheworldaway-aiworld`. The form collects and confirms constraints before generating a plan. One deterministic project model supplies the dimensions, diagram, cut list, stock assignment, shopping list, tool list, and build steps.
+A local hackathon MVP for one configurable indoor dining table. It follows the updated `spec.md` from `Radic-Al/hacktheworldaway-aiworld`. The user chooses one of three example table ideas before describing it, then confirms constraints before generating a plan. All three ideas use the same supported construction method. One deterministic project model supplies the dimensions, diagram, cut list, stock assignment, shopping list, tool list, and build steps.
+
+The three ideas are predefined examples. Connecting a Google AI Pro subscription to fund Gemini calls from this website is not supported by the Gemini API. A user-owned Gemini API key flow is deferred; the existing optional Live OCI explanation still uses server-side configuration.
 
 ## Run locally
 
 Requires Python 3.10 or newer. No package installation or frontend build is needed.
 
 ```bash
-cd woodworking-planner
+cd woodworking-planner-vercel
 python3 local_server.py
 ```
 
-Open `http://127.0.0.1:8000`. Choose **Load demo**, review the inputs, confirm them, and generate a **Sample preview**. Change the length or width and repeat; the drawing, cuts, stock assignment, and steps are regenerated together. Change instruction detail to see the same design explained differently. Use **Print plan** for a browser print or PDF view.
+Open `http://127.0.0.1:8000`. Choose a starting idea, add a description, review the inputs, confirm them, and generate a **Sample preview**. **Load demo** fills the everyday-table example. Change the length or width and repeat; the drawing, cuts, stock assignment, and steps are regenerated together. Change instruction detail to see the same design explained differently. Use **Print plan** for a browser print or PDF view.
 
 The default server binds only to `127.0.0.1`. Set `PORT` to use another port. This is a local demo server, not a hardened public deployment.
 
@@ -22,12 +24,12 @@ The same project folder now includes `public/` for Vercel's static frontend, `ap
 **Direct local upload** works even if you cannot push to GitHub:
 
 1. Install the [Vercel CLI](https://vercel.com/docs/cli): `npm i -g vercel`.
-2. In the extracted `woodworking-planner` folder, run `vercel login`, then `vercel`. Follow the prompts to create a project. This first command creates a preview deployment.
+2. In the `woodworking-planner-vercel` folder, run `vercel login`, then `vercel`. Follow the prompts to create a project. This first command creates a preview deployment.
 3. Open the preview URL. Check the page, `/api/config`, a Sample preview plan, and the print view.
 4. Set `OCI_GENAI_API_KEY` under **Project Settings → Environment Variables** for Production (and Preview if you want to test a live request there). Set `OCI_GENAI_REGION` and `OCI_GENAI_MODEL` if the defaults do not match your key and model. Keep the secret out of files and Git.
 5. Run `vercel --prod` from this folder. Environment variable changes apply to new deployments, so deploy again after changing them.
 
-**GitHub import** is an alternative after copying this folder into your repository. In Vercel, choose **Add New → Project**, import the repository, and set **Root Directory** to `woodworking-planner` if that is the folder name you committed. Leave Framework Preset as **Other**, with no custom build or output directory. Add the same environment variables and deploy. If you place this project's files at the repository root instead, keep Root Directory at `.`.
+**GitHub import** is an alternative. In Vercel, choose **Add New → Project**, import the repository, and set **Root Directory** to `woodworking-planner-vercel`. Leave Framework Preset as **Other**, with no custom build or output directory. Add the same environment variables and deploy. If you place this project's files at the repository root instead, keep Root Directory at `.`.
 
 Vercel's [Python function guide](https://vercel.com/docs/functions/runtimes/python/api-directory) documents the file-based `api/*.py` routes. Its [deployment guide](https://vercel.com/docs/cli/deploy) documents `vercel` for preview and `vercel --prod` for production.
 
@@ -62,7 +64,7 @@ The template and limits are product assumptions for the demo. They have **not** 
 
 ## What the app does
 
-- Captures an idea, dimensions, budget, tools, skill level, optional owned-material notes, confirmed item rows, and optional reference photos.
+- Shows three predefined starting ideas, then captures the selected idea's description, dimensions, budget, tools, skill level, optional owned-material notes, confirmed item rows, and optional reference photos.
 - Keeps photos in the browser session only. It does not upload, identify, or measure them.
 - Requires a review and confirmation before generating.
 - Blocks unsupported sizes and missing required tools with a concrete explanation.

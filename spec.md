@@ -6,12 +6,13 @@ Help a beginner or intermediate DIY builder turn a woodworking project idea into
 
 ## 1. Simple User Flow
 
-1. The user describes their table idea.
-2. A short form collects dimensions, budget, available tools, and skill level. Use one unit system and one currency throughout the demo.
-3. The user confirms the inputs and generates a plan.
-4. The app displays a diagram, cut list, shopping list, and assembly instructions.
-5. The user can change dimensions or request simpler/more detailed instructions and regenerate.
-6. The user can print the plan using a clean browser print view.
+1. Show at least three clearly labeled example table ideas using the one supported construction method. The user selects one before the description field appears.
+2. The user describes the selected idea. The example supplies starting dimensions, which the user can edit.
+3. A short form collects dimensions, budget, available tools, and skill level. Use one unit system and one currency throughout the demo.
+4. The user confirms the inputs and generates a plan.
+5. The app displays a diagram, cut list, shopping list, and assembly instructions.
+6. The user can change dimensions or request simpler/more detailed instructions and regenerate.
+7. The user can print the plan using a clean browser print view.
 
 Do not generate a plan immediately from a vague prompt. Ask for the missing essentials first. Explain when a request falls outside the supported table design.
 
@@ -47,6 +48,7 @@ Let the user request simpler or more detailed instructions after viewing a plan.
 - Keep dimensions and part labels fixed when AI writes or simplifies instructions.
 - Replace the displayed plan together after regeneration so outputs remain consistent. Keep user inputs if generation fails and offer retry.
 - Make one real OCI-backed AI request in the demo. Select the service and confirm access early. Keep credentials on the server and out of the repository.
+- The three starting ideas are predefined examples, not AI-generated. Google AI Pro subscription sign-in cannot authorize this website to make Gemini API calls; a user-owned Gemini API project/key connection is deferred.
 
 ## 5. Basic Boundaries
 
@@ -60,7 +62,7 @@ Let the user request simpler or more detailed instructions after viewing a plan.
 
 The MVP is ready to demonstrate when:
 
-1. A vague table idea leads to the short form and a confirmed set of inputs.
+1. Three example table ideas appear first; selecting one reveals the description field and leads to a confirmed set of inputs.
 2. One supported example produces a diagram, cut list, shopping list, and steps that agree on dimensions, quantities, and part labels.
 3. Changing length or width updates the affected outputs consistently.
 4. Confirmed matching owned materials reduce the purchase quantities and estimated cost.
@@ -79,7 +81,7 @@ Enter the constraints and confirmed owned materials, generate the plan, and show
 
 ## 8. Deferred
 
-Arbitrary furniture, outdoor/folding/extendable tables, alternative joinery systems, photorealistic design variants, automatic photo identification, live retailer pricing, stock-cutting optimization, detailed build scheduling, multiple unit systems/currencies, accounts, community, marketplace, and formal certification workflows.
+Arbitrary furniture, outdoor/folding/extendable tables, alternative joinery systems, photorealistic design variants, automatic photo identification, live retailer pricing, stock-cutting optimization, detailed build scheduling, multiple unit systems/currencies, user-owned AI provider connections, accounts, community, marketplace, and formal certification workflows.
 
 ## 9. Immediate Team Decisions
 

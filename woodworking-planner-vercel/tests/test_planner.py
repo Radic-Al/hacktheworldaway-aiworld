@@ -18,6 +18,7 @@ from local_server import Handler, get_oci_note  # noqa: E402
 
 def request_data(**overrides):
     data = {
+        "ideaPreset": "everyday",
         "idea": "A simple indoor dining table for four",
         "length": 60,
         "width": 32,
@@ -33,6 +34,15 @@ def request_data(**overrides):
 
 
 class PlannerTests(unittest.TestCase):
+    def test_starting_idea_is_required_and_does_not_override_confirmed_dimensions(self):
+        for invalid in (None, "unsupported", []):
+            with self.subTest(invalid=invalid), self.assertRaises(PlanError) as missing:
+                build_plan(request_data(ideaPreset=invalid))
+            self.assertEqual(missing.exception.field, "ideaPreset")
+        plan = build_plan(request_data(ideaPreset="compact", length=60, width=32))
+        self.assertEqual(plan["inputs"]["ideaTitle"], "Compact dining nook")
+        self.assertEqual(plan["geometry"]["length"], 60)
+
     def test_all_outputs_reference_one_set_of_parts(self):
         plan = build_plan(request_data())
         ids = {part["id"] for part in plan["parts"]}
